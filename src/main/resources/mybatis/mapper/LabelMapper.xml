@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winter.mapper.LabelMapper">
+    <!--<resultMap id="ArticleWithMessage" type="com.winter.bean.ArticleWithMessage">-->
+        <!--<id property="articleID" column="articleID"/>-->
+        <!--<result property="userName" column="user_name"/>-->
+
+        <!--<collection property="message" javaType="com.winter.bean.Message"-->
+                    <!--resultMap="com.test.repository.mybatis.UserMapper.Mail"/>-->
+
+    <!--</resultMap>-->
+
+    <insert id="addLabel" parameterType="com.winter.bean.Label">
+        insert into t_label
+            (labelID,labelName,createTime,status)
+        values
+            (#{labelID},#{labelName},now(),#{status})
+    </insert>
+
+    <!-- 获取文章列表 -->
+    <update id="updateLabel">
+        update
+            t_label
+        <set>
+            <if test="status != '' and status != null">
+                status = '99'
+            </if>
+            <if test="labelName != '' and labelName != null">
+                labelName = #{labelName}
+            </if>
+        </set>
+        where
+            labelID = #{labelID}
+    </update>
+
+    <select id="getLabelList" resultType="com.winter.bean.Label">
+        select
+            labelID,labelName,createTime,status
+        from
+            t_label
+        <where>
+            1=1
+            <if test="status != '' and status != null">
+                and status = #{status}
+            </if>
+            <if test="labelName != '' and labelName != null">
+                <bind name="labelName" value="'%' + labelName + '%'"/>
+                and labelName = #{labelName}
+            </if>
+        </where>
+    </select>
+
+    <select id="getLabelDetail" resultType="com.winter.bean.Label">
+        select
+            labelID,labelName,createTime,status
+        from
+            t_label
+        where
+            labelID = #{labelID}
+    </select>
+
+</mapper>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+</head>
+<style>
+
+    /*首页-轮播图*/
+    .homePic{
+        width:100%;
+        height:100%;
+    }
+
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 70px;
+        height: 70px;
+        border-radius: 50px;
+        margin: auto
+    }
+
+    /*有滚动效果但是不显示滚动条*/
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+
+</style>
+
+<body class="layui-layout-body" style="background-color: #EEEEEE;">
+<div class="layui-layout layui-layout-admin">
+    <!-- 头部菜单区 start -->
+        <div class="layui-header">
+            <div class="layui-logo">
+                <!--<img style="width:50px;height:50px" src="/image/logo2.png">-->
+                <p style="font-size: 28px">蜗牛</p>
+            </div>
+            <!-- 头部区域（可配合layui已有的水平导航） -->
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item">
+                    <a href="javascript:void(0);" onclick="toMain()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe68e;</i>&nbsp;
+                        首页
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe631;</i>&nbsp;
+                        工具
+                    </a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="https://www.json.cn/" target="_blank">json格式化</a></dd>
+                        <dd><a href="https://c.runoob.com/front-end/710" target="_blank">xml格式化</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <!--<a href="http://localhost:8088/snail/message/toMessageList" onclick="toMessageList()">留言板</a>-->
+                    <a href="javascript:void(0)" onclick="toMessageList()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe63a;</i>&nbsp;
+                        留言板
+                    </a>
+                </li>
+            </ul>
+
+            <ul style="padding:10px;position: absolute;right:30px">
+                <li class="layui-nav-item">
+                    <input type="text" style="margin-right:100px;width:300px;border-radius: 30px" name="keyword" lay-verify="keyword" autocomplete="off" placeholder="请输入要搜索内容" class="layui-input">
+                </li>
+                    <i class="layui-icon" style="cursor:pointer;position: absolute;right: 128px;top: 15px;font-size: 25px; color: #000" >&#xe615;</i>
+            </ul>
+        </div>
+    <!-- 头部菜单区 end -->
+
+    <!-- 正文区 start -->
+    <div class="layui-body" style="position:absolute;left:0;bottom: 24px;top: 32px">
+        <iframe id="main"  src="/snail/article/toHome" style="width:100%;height:98%" Frameborder=No Border=0 Marginwidth=0 Marginheight=0 Scrolling=No></iframe>
+    </div>
+    <!-- 正文区 end -->
+
+    <!-- 底部固定区域 start -->
+    <div class="layui-footer"  style="position:absolute;left:0;background-color: #2F4056;">
+        <span style="color:#bbb">© 2021 李晓炜 &nbsp;&nbsp;&nbsp;  email_lxw@163.com  &nbsp;&nbsp;&nbsp;   免责声明</span>
+    </div>
+    <!-- 底部固定区域 end -->
+</div>
+</body>
+<script type="text/javascript">
+    //初始化方法
+    $(function(){
+
+    })
+
+
+
+    function toMain(){
+        $('#main').attr('src','/snail/article/toHome');
+    }
+
+    function toMessageList(){
+        $('#main').attr('src','/snail/message/toMessageList');
+    }
+
+    //跳转到文章详情页
+    function toArticleDetail(articleID){
+        $('#main').attr('src','/snail/article/toArticleDetail?articleID='+articleID);
+    }
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+</script>
+</html>

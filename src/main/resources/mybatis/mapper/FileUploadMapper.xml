@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winter.mapper.FileUploadMapper">
+    <!--<resultMap id="getMessageList" type="com.winter.bean.ArticleWithMessage">-->
+        <!--<id property="articleID" column="articleID"/>-->
+        <!--<result property="userName" column="user_name"/>-->
+
+        <!--<collection property="message" javaType="com.winter.bean.Message"-->
+                    <!--resultMap="com.test.repository.mybatis.UserMapper.Mail"/>-->
+
+    <!--</resultMap>-->
+
+
+    <!-- 获取附件列表 -->
+    <select id="getFileList" resultType="com.winter.bean.FileUpload">
+        select
+           fileID,fileName,filePath,username,createTime
+        from
+          t_sys_file
+        <where>
+            1=1
+            <if test="fileID != null and fileID != ''">
+                and fileID = #{fileID}
+            </if>
+        </where>
+        order by createTime
+    </select>
+
+    <!-- 添加附件 -->
+    <insert id="addFile" parameterType="com.winter.bean.FileUpload">
+        insert into
+          t_sys_file
+        values
+          (#{fileID},#{fileName},#{filePath},#{username},now())
+    </insert>
+
+
+
+</mapper>

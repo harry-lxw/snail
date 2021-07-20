@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <link rel="stylesheet" th:href="@{/template/backgroundPicture.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+    <script type="text/javascript" th:src="@{/package/dist/wangEditor.min.js}"></script>
+</head>
+<style>
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        margin: auto
+    }
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+    #btn:hover{
+        /*color: #2ec770*/
+        color: #009688;
+        border: 1px solid #009688;
+    }
+
+    img{
+        width: 800px;
+        height: 400px
+    }
+
+</style>
+<body class="layui-layout-body" style="background-color: #EEEEEE;">
+
+<div class="layui-layout layui-layout-admin">
+<!-- 正文区 start -->
+<!--<div class="layui-body" style="position:absolute;left:0;">-->
+    <div class="layui-col-md12" id="top" style="width:95%;margin:20px 42px 20px 42px;overflow-y:auto">
+        <div class="layui-row grid-demo grid-demo-bg1">
+
+            <!-- 文章内容 start -->
+            <div class="layui-col-md8" style="width:73.5%;background-color: #fff;margin-top:20px;margin-right:20px;">
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:85px">
+                    <p class="cardTitle" style="color:black" id="title"></p>
+                    <div style="margin-top: 10px;margin-left:20px;">
+                        <!--<i class="layui-icon layui-icon-username"></i>-->
+                        <!--&nbsp;<span style="color:#aaa">李晓炜</span>-->
+                        <!--<i class="layui-icon layui-icon-time" style="margin-left: 20px"></i>-->
+                        <span style="color:rgba(114,114,114,0.88)" id="createTime"></span>
+                        <!--<i class="layui-icon layui-icon-at" style="margin-left: 20px"></i>-->
+                        &nbsp;
+                        <span style="margin-left: 20px;color:rgba(114,114,114,0.88);">浏览量：</span>
+                        <span style="color:rgba(114,114,114,0.88)" id="pageView"></span>
+                    </div>
+                </div>
+
+                <div class="layui-col-md12" style="">
+                    <div style="font-size: 18px;padding:20px" id="content"></div>
+                </div>
+            </div>
+            <!-- 特别推荐 end -->
+
+            <!-- 热门标签 start -->
+            <div class="layui-col-md3" style="background-color: #fff;margin-top:20px;height:425px;">
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">
+                    <p class="cardTitle">
+                        <i class="layui-icon" style="font-size: 30px;">&#xe66e;</i>&nbsp;
+                        热门标签
+                    </p>
+                </div>
+                <div class="layui-col-md12" id="label" style="height:375px;padding:10px;overflow-y:auto">
+                </div>
+            </div>
+            <!-- 热门标签 end -->
+
+            <!-- 上一篇、下一篇 start -->
+            <!--<div class="layui-col-md8" style="width:73.5%;margin-right:20px;">-->
+                <!--<div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">-->
+                    <!--<span style="color:#aaa;font-size: 15px;margin-left:20px" >上一篇：</span>-->
+                    <!--<span style="color:black;font-size: 17px" >YzmCMS v6.0正式版发布</span>-->
+                    <!--<span style="color:#aaa;font-size: 15px;margin-left:220px" >下一篇：</span>-->
+                    <!--<span style="font-size: 17px" >YzmCMS v6.0正式版发布</span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!-- 上一篇、下一篇 end -->
+
+            <!-- 最近文章 start -->
+            <div class="layui-col-md9" style="padding:20px;width:73.5%;background-color: #fff;margin-right:20px;margin-top:20px;margin-bottom:20px;">
+                <!--<div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">-->
+                    <!--<p class="cardTitle">最近文章</p>-->
+                <!--</div>-->
+                <div class="layui-col-md12" style="padding: 15px;">
+                    <div  class="layui-col-md12">
+                        <p style="font-size: 30px;color: #5FB878">添加评论</p>
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:18px">
+                        <textarea style="resize:none;border:2px solid #E0E0E0;" name="messageContent" id="messageContent" placeholder="请输入内容..." class="layui-textarea"></textarea>
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:10px">
+                        <input type="text" name="messageUsername" id="messageUsername" style="width:45%;border:2px solid #E0E0E0;" required  lay-verify="required" placeholder="请输入昵称..." autocomplete="off" class="layui-input">
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:10px;">
+                        <a href="javascript:;" onclick="addMessage()" class="layui-btn" style="height:50px;width:100%;border-radius: 5px">
+                            <p style="font-size: 20px;margin-top:7px;">提交评价</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:46px;margin-top: 30px">
+                    <p class="cardTitle" style="font-size: 18px;color: black;font-weight: bold">共<span id="messageCount"></span>条评论</p>
+                </div>
+                <div class="layui-col-md12" style="padding:20px;border:2px solid #E0E0E0;" id="articleMessage">
+
+                </div>
+            </div>
+            <!-- 最近文章 end -->
+
+            <!-- 最近评论 start -->
+            <div class="layui-col-md3" style="background-color: #fff;margin-top: 20px">
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">
+                    <p class="cardTitle">
+                        <i class="layui-icon" style="font-size: 30px;">&#xe63a;</i>&nbsp;
+                        最近评论
+                    </p>
+                </div>
+
+                <div class="layui-col-md12" id="message"  style="padding:20px;">
+
+                </div>
+            </div>
+            <!-- 最近评论 end -->
+        </div>
+    <!--</div>-->
+</div>
+<!-- 正文区 end -->
+</div>
+</body>
+<script type="text/html" id="labelTemplate">
+    {{each data as obj i}}
+    <a href="/snail/article/toLabelArticle?labelID={{obj.labelID}}&labelName={{obj.labelName}}" id="btn" target="_blank" class="layui-btn layui-btn-primary" style="margin-top:10px;">{{obj.labelName}}</a>
+    {{/each}}
+</script>
+<script type="text/html" id="articleMessageTemplate">
+    {{each messageList as obj i}}
+        <div  class="layui-col-md1">
+            <img class="messagePic" src="/image/user.png">
+        </div>
+        <div class="layui-col-md11" style="margin-bottom: 10px">
+            <div class="layui-col-md12" style="margin-bottom: 10px">
+                <p style="font-size: 16px;font-weight: bold;">{{obj.messageUsername}}：</p>
+                <p style="color: #666666;font-size: 15px;margin-top: 10px;">{{obj.content}}</p>
+            </div>
+            <div class="layui-col-md12" style="margin-bottom: 10px">
+                <span style="color: #aaa;font-size: 15px;">{{obj.createTime}}</span>
+                <span onclick="" style="color: #aaa;font-size: 15px;margin-right: 35px;float:right;color:cadetblue">回复</span>
+            </div>
+        </div>
+        <hr>
+    {{/each}}
+</script>
+
+<script type="text/html" id="messageTemplate">
+    {{each messageList as obj i}}
+    {{if i<3}}
+    <div  class="layui-col-md4">
+        <img class="messagePic" src="/image/youmo.jpg">
+    </div>
+    <div class="layui-col-md8" style="margin-bottom: 10px">
+        <p style="font-size: 20px;font-weight: bold;word-wrap:break-word;">{{obj.messageUsername}}：</p>
+        <p style="color: #aaa;font-size: 15px;margin-top: 5px;">{{obj.createTime}}</p>
+        <p style="color: #666666;font-size: 18px;margin-top: 10px;word-wrap:break-word;">{{obj.content}}</p>
+    </div>
+    <hr>
+    {{/if}}
+    {{/each}}
+</script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+    var article = /*[[${article}]]*/;
+    var messageList = /*[[${messageList}]]*/;
+    var messageCount = /*[[${messageCount}]]*/;
+    var articleID = article.articleID;
+    $(function(){
+        //回显文章信息
+        showArticleDetail();
+        //回显文章留言信息
+        showArticleMessage();
+        //回显标签信息
+        getLabelList();
+        //获取最近评价
+        showMessage();
+
+        //动态设置页面高度
+        var windowHeight = $(window).height();
+        $('#top').css('height', windowHeight*0.972);
+    })
+
+    function showMessage(){
+        $.post("/snail/message/getMessageList", {}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('messageTemplate', retStr);
+            $('#message').html(html);
+        })
+    }
+
+    //添加留言
+    function addMessage(){
+        var messageUsername = $('#messageUsername').val();
+        var messageContent = $('#messageContent').val();
+        if(messageContent == ''){
+            showMsg("请输入留言内容");
+            return;
+        }
+        if(messageUsername == ''){
+            showMsg("请输入昵称");
+            return;
+        }
+        var url = "/snail/message/addMessage";
+        var param ={
+            messageUsername : messageUsername,
+            messageContent : messageContent,
+            articleID : articleID
+        }
+        $.post(url, param, function(retStr){
+            if(retStr == '1'){
+                reloadMessageList();
+                showMsg("操作成功");
+            }else{
+                showMsg("操作失败");
+            }
+        })
+    }
+
+    //回显标签信息
+    function getLabelList(){
+        var url = "/snail/label/getLabelList";
+        $.post(url, {status:'1'}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('labelTemplate', retStr);
+            $('#label').append(html);
+        })
+    }
+
+    //刷新留言信息
+    function reloadMessageList(){
+        $.post("/snail/message/getMessageList", {articleID:articleID}, function(retStr){
+            var html = template('articleMessageTemplate', retStr);
+            // alert(messageList);
+            $('#articleMessage').html(html);
+            $('#messageCount').html(retStr.messageCount);
+            $('#messageContent').val('');
+            $('#messageUsername').val('');
+        })
+    }
+
+
+
+    //回显文章信息
+    function showArticleDetail(){
+        $('#title').html(article.title);
+
+        //---------------------------------富文本 start--------------------------------------
+        // var E = window.wangEditor
+        // var editor = new E('#content') // 两个参数也可以传入 elem 对象，class 选择器
+        //
+        // editor.config.menuFixed = false;
+        // var windowHeight = $(window).height();
+        // var contentHeight = windowHeight*0.9;
+        // // alert(article.content.length>700);
+        // var mult = article.content.length/700;
+        // alert(mult)
+        // if(mult > 1){
+        //     contentHeight = mult * windowHeight*1.28;
+        // }
+        // alert(contentHeight);
+        // editor.config.height = contentHeight;
+        //
+        // editor.create();
+        // editor.disable();
+        // //---------------------------------富文本 end--------------------------------------
+        // editor.txt.html('<p>'+article.content+'<p>');
+
+        //动态设置内容区高度
+        // alert($('#content').height());
+        $('#content').html(article.content);
+        if($('#content').height()<450){
+            var windowHeight = $(window).height();
+            var contentHeight = windowHeight*0.7;
+            $('#content').css('height', contentHeight);
+
+        }
+        // else{
+        //      editor.config.height = 1500;
+        //
+        // }
+
+        $('#pageView').html(article.pageView);
+        $('#createTime').html(article.createTime);
+    }
+
+    //回显文章留言信息
+    function showArticleMessage(){
+        var html = template('articleMessageTemplate', messageList);
+        if(html==""){
+            $('#articleMessage').append("没有评价");
+            $('#messageCount').html(0);
+        }else{
+            $('#articleMessage').append(html);
+            $('#messageCount').html(messageCount);
+        }
+    }
+
+//提示框
+function showMsg(msg){
+    layer.msg(msg, {
+        time: 3000 //3s后自动关闭
+    });
+}
+
+//固定的返回顶部图标
+layui.use(['util', 'layer'], function() {
+    var layer = layui.layer;
+    util = layui.util;
+    //固定块
+    util.fixbar({
+        top: true
+        , css: {right: 50, bottom: 100}
+        , bgcolor: '#393D49!important;display:block;'
+        , showHeight: 150
+        , click: function (type) {
+            if (type === 'top') {
+                // alert(1);
+                // $('html,body').animate({'scrollTop':0},300);
+                $('#top').animate({'scrollTop':0},300);
+                // $('body').animate({
+                //     scrollTop: 0
+                // }, 200);
+            }
+        }
+    });
+});
+
+//JavaScript代码区域
+layui.use('element', function(){
+    var element = layui.element;
+});
+
+layui.use('layer', function() { //独立版的layer无需执行这一句
+    var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+})
+
+
+/*]]>*/
+</script>
+</html>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winter.mapper.ArticleMapper">
+    <!--<resultMap id="ArticleWithMessage" type="com.winter.bean.ArticleWithMessage">-->
+        <!--<id property="articleID" column="articleID"/>-->
+        <!--<result property="userName" column="user_name"/>-->
+
+        <!--<collection property="message" javaType="com.winter.bean.Message"-->
+                    <!--resultMap="com.test.repository.mybatis.UserMapper.Mail"/>-->
+
+    <!--</resultMap>-->
+
+    <!-- 添加文章 -->
+    <insert id="addArticle" parameterType="com.winter.bean.Article">
+        insert into t_article
+            (articleID,labelID,title,remark,content,fileID,pageView,supportCount,
+              createTime,homePageStatus,recommendStatus,status)
+        values
+            (#{articleID},#{labelID},#{title},#{remark},#{content},#{fileID},#{pageView},#{supportCount},now(),#{homePageStatus},#{recommendStatus},#{status})
+    </insert>
+
+    <!-- 修改文章点赞量+1 -->
+    <update id="updateArticleSupportCount" parameterType="String">
+        update
+          t_article
+        set
+          supportCount = supportCount+1
+        where
+          articleID = #{articleID}
+    </update>
+
+    <!-- 修改文章浏览量+1 -->
+    <update id="updateArticlePageViewCount" parameterType="String">
+        update
+          t_article
+        set
+          pageView = pageView+1
+        where
+          articleID = #{articleID}
+    </update>
+
+    <!-- 修改文章 -->
+    <update id="updateArticle" parameterType="com.winter.bean.Article">
+      update
+          t_article
+      <set>
+          <if test="title != '' and title != null">
+              title = #{title},
+          </if>
+          <if test="remark != '' and remark != null">
+              remark = #{remark},
+          </if>
+          <if test="homePageStatus != '' and homePageStatus != null">
+              homePageStatus = #{homePageStatus},
+          </if>
+          <if test="recommendStatus != '' and recommendStatus != null">
+              recommendStatus = #{recommendStatus},
+          </if>
+          <if test="content != '' and content != null">
+              content = #{content},
+          </if>
+      </set>
+      where
+        articleID = #{articleID}
+    </update>
+
+    <!-- 获取文章列表 -->
+    <select id="getArticleList" resultType="com.winter.bean.Article">
+        select
+          a.articleID,a.labelID,a.title,a.remark,a.content,a.fileID,a.pageView,a.supportCount,
+          a.createTime,a.homePageStatus,a.recommendStatus,a.status,
+          f.filePath,f.fileName,l.labelName
+        from
+          t_article a
+        inner join
+          t_sys_file f
+        on
+          a.fileID = f.fileID
+        inner join
+          t_label l
+        on
+          l.labelID = a.labelID
+        where
+          a.status != '99'
+          <if test="title != '' and title != null">
+              and a.title like concat('%',#{title},'%')
+          </if>
+          <if test="content != '' and content != null">
+              <bind name="content" value="'%'+content+'%'" />
+              and a.content like #{content}
+          </if>
+          <if test="labelID != '' and labelID != null">
+              and a.labelID = #{labelID}
+          </if>
+          order by a.createTime desc
+
+    </select>
+
+    <!-- 获取特别推荐文章 || 获取首页接口 -->
+    <select id="getArticleListByStatus" resultType="com.winter.bean.Article">
+        select
+          a.articleID,a.labelID,a.title,a.remark,a.content,a.fileID,a.pageView,a.supportCount,
+          a.createTime,a.homePageStatus,a.recommendStatus,a.status,
+          f.filePath,f.fileName
+        from
+          t_article a
+        left join
+          t_sys_file f
+        on
+        a.fileID = f.fileID
+        <where>
+            a.status != '99'
+            <if test="recommendStatus != '' and recommendStatus != null">
+                and a.recommendStatus = #{recommendStatus}
+            </if>
+            <if test="homePageStatus != '' and homePageStatus != null">
+                and a.homePageStatus = #{homePageStatus}
+            </if>
+            <if test="labelID != '' and labelID != null">
+                and a.labelID = #{labelID}
+            </if>
+        </where>
+        order by a.createTime desc
+        limit #{page},#{limitNum}
+
+    </select>
+
+    <!-- 获取所有文章数量（最近文章不断的加载新的文章用） -->
+    <select id="getArticleListCount" resultType="Integer" parameterType="String">
+        select
+          count(0)
+        from
+          t_article
+        where
+          status != '99'
+            <if test="labelID != '' and labelID != null">
+                and labelID = #{labelID}
+            </if>
+    </select>
+
+    <!-- 获取文章详情 -->
+    <select id="getArticleDetailByID" resultType="com.winter.bean.Article">
+        select
+          a.articleID,a.labelID,a.title,a.remark,a.content,a.fileID,a.pageView,a.supportCount,
+          a.createTime,a.homePageStatus,a.recommendStatus,a.status
+        from
+          t_article a
+        where
+          a.status != '99'
+          and a.articleID = #{articleID}
+    </select>
+
+
+
+    <update id="deleteArticle">
+        update
+          t_article
+        set
+          status = '99'
+        where
+          articleID = #{articleID}
+    </update>
+
+</mapper>

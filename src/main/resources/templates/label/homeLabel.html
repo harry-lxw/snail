@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+</head>
+<style>
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+    #btn:hover{
+        /*color: #2ec770*/
+        color: #009688;
+        border: 1px solid #009688;
+    }
+
+</style>
+
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <!-- 正文区 start -->
+        <div class="layui-row grid-demo grid-demo-bg1">
+            <!-- 热门标签 start -->
+            <div style="background-color: #fff;">
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px;padding:2px">
+                    <p class="cardTitle">
+                        <i class="layui-icon" style="font-size: 30px;">&#xe66e;</i>&nbsp;
+                        热门标签
+                    </p>
+                </div>
+                <div class="layui-col-md12" id="label" style="height:375px;padding:10px;overflow-y:auto">
+                </div>
+            </div>
+            <!-- 热门标签 end -->
+        </div>
+    </div>
+    <!-- 正文区 end -->
+
+<!--</div>-->
+</body>
+<script type="text/html" id="labelTemplate">
+    {{each data as obj i}}
+    <a href="/snail/article/toLabelArticle?labelID={{obj.labelID}}&labelName={{obj.labelName}}" id="btn" target="_blank" class="layui-btn layui-btn-primary" style="margin-top:10px;">{{obj.labelName}}</a>
+    {{/each}}
+</script>
+
+<script type="text/javascript">
+    //初始化方法
+    $(function(){
+        //获取热门标签
+        getLabelList();
+    })
+
+    function getLabelList(){
+        var url = "/snail/label/getLabelList";
+        $.post(url, {status:'1'}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('labelTemplate', retStr);
+            $('#label').append(html);
+        })
+    }
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+
+</script>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+    <script type="text/javascript" th:src="@{/package/dist/wangEditor.min.js}"></script>
+
+</head>
+<style>
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+    .toolbar {
+        border: 1px solid #ccc;
+    }
+
+    .text {
+        border: 1px solid #ccc;
+        height: 400px;
+    }
+</style>
+<body>
+<form class="layui-form" action="post" style="margin-right:42px;margin-top:20px;">
+    <!-- 正文内容存值 -->
+    <input type="hidden" id="content">
+    <input type="hidden" id="filePath" name="filePath">
+    <input type="hidden" id="fileName" name="fileName">
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="title" id="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">轮播</label>
+        <div class="layui-input-block">
+            <select name="homePageStatus" id="homePageStatus" lay-verify="required">
+                <option value="1">展示</option>
+                <option value="0">不展示</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">推荐</label>
+        <div class="layui-input-block">
+            <select name="recommendStatus" id="recommendStatus" lay-verify="required">
+                <option value="1">展示</option>
+                <option value="0">不展示</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">标签</label>
+        <div class="layui-input-block">
+            <select name="labelID" id="labelID" lay-verify="required">
+                <option value="">请选择</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">图片</label>
+        <div class="layui-upload">
+            <button type="button" class="layui-btn" id="test1"><i class="layui-icon">&#xe67c;</i>上传图片</button>
+            <!--<div class="layui-upload-list" style="">-->
+                <img class="layui-upload-img" id="demo1" style="width:150px;height:100px;margin-left:20px">
+                <p id="demoText"></p>
+            <!--</div>-->
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="remark" id="remark" placeholder="请输入备注" class="layui-textarea" style="height:100px;resize: none;;overflow:hidden"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">正文</label>
+        <div class="layui-input-block">
+            <!--<textarea name="content" id="content" placeholder="请输入正文内容" class="layui-textarea" style="height:500px;resize: none;;overflow:hidden"></textarea>-->
+            <div id="div1" class="toolbar"></div>
+            <div id="div2" class="text">
+                <!--可使用 min-height 实现编辑区域自动增加高度-->
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+
+<script type="text/html" id="labelTemplate">
+    {{each data as obj i}}
+        <option value="{{obj.labelID}}">{{obj.labelName}}</option>
+    {{/each}}
+</script>
+<script type="text/javascript">
+
+    $(function(){
+        getLabelList();
+    })
+
+    function getLabelList(){
+        var url = "/snail/label/getLabelList";
+        $.post(url, {status:'1'}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('labelTemplate', retStr);
+            $('#labelID').append(html);
+
+            layui.use('form', function(){
+                var form = layui.form;
+
+            });
+
+            //附件上传
+            layui.use('upload', function() {
+                var $ = layui.jquery
+                    , upload = layui.upload;
+
+                //普通图片上传
+                var uploadInst = upload.render({
+                    elem: '#test1'
+                    , url: 'upload' //改成您自己的上传接口
+                    // , before: function (obj) {
+                    //     //预读本地文件示例，不支持ie8
+                    //     obj.preview(function (index, file, result) {
+                    //         $('#demo1').attr('src', result); //图片链接（base64）
+                    //     });
+                    // }
+                    , done: function (res) {
+                        //如果上传失败
+                        if (res.code > 0) {
+                            return layer.msg('上传失败');
+                        }else{
+                            // alert(res.filePath);
+                            $('#demo1').attr('src', res.filePath);
+                            $("input[name='filePath']").val(res.filePath);
+                            $("input[name='fileName']").val(res.fileName);
+                            // return layer.msg('上传成功');
+                        }
+                        //上传成功
+                    }
+                    , error: function () {
+                        //演示失败状态，并实现重传
+                        var demoText = $('#demoText');
+                        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                        demoText.find('.demo-reload').on('click', function () {
+                            uploadInst.upload();
+                        });
+                    }
+                });
+            })
+
+        })
+    }
+
+
+/*  ----------富文本 start----------  */
+    var E = window.wangEditor
+    var editor = new E('#div1', '#div2') // 两个参数也可以传入 elem 对象，class 选择器
+    editor.config.zIndex = 1    //解决遮挡标签下拉选
+    editor.config.showFullScreen = true
+    editor.config.placeholder = '请输入正文内容'
+    // editor.config.onchange = function (newHtml) {   //change事件
+    //     editor.txt.text();
+    // }
+    // 配置服务器端地址
+    editor.config.uploadImgServer = '/snail/upload/editor'
+    //配置指定文件名                         /snail/label/getLabelList
+    editor.config.uploadFileName = 'file'
+    //如果图片不大，可以用base64存储
+    //editor.config.uploadImgShowBase64 = true
+    editor.config.onchange = function (html){
+        $('#content').val(html)
+    }
+    editor.config.uploadImgHooks = {
+        // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
+        // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+        customInsert : function(insertImg, result, editor) {
+            // 图片上传并返回结果，自定义插入图片的事件（而不是编辑器自动插入图片！！！）
+            // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
+            // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
+            var url = result.url
+            // alert(url);
+            insertImg(url)
+        }
+    }
+    editor.create()
+/*  ----------富文本 end----------  */
+</script>
+</html>

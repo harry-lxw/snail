@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winter.mapper.LogMapper">
+    <select id="getLogList" resultType="com.winter.bean.Log">
+        select
+          logID,operationName,username,createTime,content
+        from
+          t_operation_log
+        <where>
+            1=1
+            <if test="username != '' and username != null">
+              <bind name="username" value="'%'+username+'%'"></bind>
+                  and username like #{username}
+            </if>
+            <if test="content != '' and content != null">
+                <bind name="content" value="'%'+content+'%'"></bind>
+                and content like #{content}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+
+    <insert id="addLog" parameterType="com.winter.bean.Log">
+        insert into
+          t_operation_log
+          (logID,operationName,username,createTime,content)
+          values
+          (#{logID},#{operationName},#{username},now(),#{content})
+    </insert>
+
+</mapper>

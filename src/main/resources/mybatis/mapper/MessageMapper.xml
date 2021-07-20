@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.winter.mapper.MessageMapper">
+    <!--<resultMap id="getMessageList" type="com.winter.bean.ArticleWithMessage">-->
+        <!--<id property="articleID" column="articleID"/>-->
+        <!--<result property="userName" column="user_name"/>-->
+
+        <!--<collection property="message" javaType="com.winter.bean.Message"-->
+                    <!--resultMap="com.test.repository.mybatis.UserMapper.Mail"/>-->
+
+    <!--</resultMap>-->
+
+
+    <!-- 获取文章列表 -->
+    <select id="getMessageList" resultType="com.winter.bean.Message">
+        select
+           messageID,messageUserID,messageUsername,replyUserID,replyUsername,
+          content,createTime,status,articleID
+        from
+          t_message
+        <where>
+            status = '1'
+            <if test="articleID != null and articleID != ''">
+                and articleID = #{articleID}
+            </if>
+            <if test="articleID == null or articleID == ''">
+                and articleID is null
+            </if>
+            <if test="messageID != null and messageID != ''">
+                and messageID = #{messageID}
+            </if>
+        </where>
+        order by createTime desc
+    </select>
+
+    <!-- 添加留言 -->
+    <insert id="addMessage" parameterType="com.winter.bean.Message">
+        insert into
+          t_message
+        values
+          (#{messageID},#{messageUserID},#{messageUsername},#{replyUserID},
+          #{replyUsername},#{content},now(),#{status},#{articleID})
+    </insert>
+
+    <update id="deleteMessage" >
+        update
+          t_message
+        set status = '99'
+        where
+          messageID = #{messageID}
+    </update>
+
+    <!-- 获取评论总条数 -->
+    <select id="getMessageCount" resultType="int">
+        select
+            count(0)
+        from
+            t_message
+        <where>
+            status = '1'
+            <if test="articleID != null and articleID != ''">
+                and articleID = #{articleID}
+            </if>
+            <if test="articleID == null or articleID == ''">
+                and articleID is null
+            </if>
+        </where>
+
+    </select>
+
+
+</mapper>

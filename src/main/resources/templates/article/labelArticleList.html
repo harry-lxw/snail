@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <!-- 背景图片 -->
+    <link rel="stylesheet" th:href="@{/template/backgroundPicture.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+</head>
+<style>
+    /*首页-轮播图*/
+    .homePic{
+        width:100%;
+        height:100%;
+    }
+
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 70px;
+        height: 70px;
+        border-radius: 50px;
+        margin: auto
+    }
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+    #btn:hover{
+        /*color: #2ec770*/
+        color: #009688;
+        border: 1px solid #009688;
+    }
+
+    #showBig:hover{
+        transform:scale(1.02);  /* 悬浮放大效果 */
+        /*color: green;*/
+        /*background-color: #F0FFF0;  */
+        color: #ff4d4d;
+        background-color: #F0F0F0;
+    }
+
+</style>
+
+<body class="layui-layout-body" style="background-color: #EEEEEE">
+<div class="layui-layout layui-layout-admin">
+
+    <!-- 正文区 start -->
+    <!--<div class="layui-body" style="position:absolute;left:0;">-->
+        <div class="layui-col-md12" id="mainList" style="width:95%;margin:20px 42px 20px 42px;overflow-y:auto">
+            <!--<div class="layui-row grid-demo grid-demo-bg1">-->
+
+                <!-- 标签文章 start -->
+                <div class="layui-col-md9" style="width:73.5%;background-color: #F5F5F5;height:50px;margin-top:20px;">
+                    <div class="layui-col-md12">
+                        <p class="cardTitle">
+                            <span id="labelName" style="color:#5FB878"></span>
+                            的结果，共
+                            <span id="count" style="color:#5FB878"></span>
+                            条
+                        </p>
+                    </div>
+                    <div id="recentlyArticle" class="layui-col-md12" style="width:100%;background-color: #fff;margin-right:20px;">
+                    </div>
+                </div>
+                <!-- 标签文章 end -->
+
+            <!--</div>-->
+            <!-- 热门标签 start -->
+            <div class="layui-col-md3" style="margin-left:20px;background-color: #fff;margin-top:20px;height:425px;">
+                <!--<iframe src="/snail/label/toHomeLabel" style="width:100%;height:100%"></iframe>-->
+                <div style="background-color: #fff;height:425px;">
+                    <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">
+                        <p class="cardTitle">热门标签</p>
+                    </div>
+                    <div class="layui-col-md12" id="label" style="height:375px;padding:10px;overflow-y:auto">
+                    </div>
+                </div>
+            </div>
+            <!-- 热门标签 end -->
+        </div>
+    </div>
+    <!-- 正文区 end -->
+
+<!--</div>-->
+</body>
+<script type="text/html" id="labelTemplate">
+    {{each data as obj i}}
+    <a href="javascript:void(0);" id="btn" onclick="getLabelArticleList('{{obj.labelID}}','{{obj.labelName}}')" class="layui-btn layui-btn-primary" style="margin-top:10px;">{{obj.labelName}}</a>
+    {{/each}}
+</script>
+
+<script type="text/html" id="recentlyTemplate">
+    {{each homePageArticleList as obj i}}
+        <div class="layui-col-md12" id="showBig"  style="padding:15px;border:2px solid #EEEEEE;">
+            <div  class="layui-col-md4">
+                <img class="articlePic" src="/image/yuying.jpg">
+            </div>
+            <div class="layui-col-md8">
+                <p onclick="toArticleDetail('{{obj.articleID}}')" title="{{obj.title}}" style="font-size: 25px;font-weight: bold;margin-top: 8px;">
+                    {{if obj.title.length<=25}}
+                        {{obj.title}}
+                    {{else}}
+                        {{obj.title.substring(0,25)}}...
+                    {{/if}}
+                </p>
+                <p title="{{obj.content.substring(0,400)}}......" style="color: #aaa;font-size: 15px;margin-top: 10px;">
+                    {{if obj.content.length<=249}}
+                        {{obj.content}}
+                    {{else}}
+                        {{obj.content.substring(0,249)}}...
+                    {{/if}}
+                </p>
+            </div>
+            <div style="position:absolute;bottom: 15px;right:420px">
+                <!--<i class="layui-icon layui-icon-username"></i>-->
+                <!--&nbsp;<span style="color:#aaa">李晓炜</span>-->
+                <i class="layui-icon layui-icon-time" style="margin-left: 20px;color:#aaa"></i>
+                &nbsp;<span style="color:#aaa">2021-02-05 16:09:30</span>
+                <i class="layui-icon layui-icon-at" style="margin-left: 20px;color:#aaa"></i>
+                &nbsp;<span style="color:#aaa">1024</span>
+            </div>
+        </div>
+    {{/each}}
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var labelID = /*[[${labelID}]]*/;
+    var labelName = /*[[${labelName}]]*/;
+    //初始化方法
+    $(function(){
+        //获取热门标签
+        getLabelList();
+        $('#labelName').text("\""+labelName+"\"");
+        //加载文章
+        reloadArticle();
+
+    })
+
+    function getLabelList(){
+        var url = "/snail/label/getLabelList";
+        $.post(url, {status:'1'}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('labelTemplate', retStr);
+            $('#label').append(html);
+        })
+    }
+
+    //获取指定标签文章列表
+    function getLabelArticleList(labelID_1, labelName_1){
+        if(labelID_1 != null && labelID_1 != ''){
+            labelID = labelID_1;
+        }
+        if(labelName_1 != null && labelName_1 != ''){
+            labelName = labelName_1;
+            $('#labelName').text("\""+labelName+"\"");
+        }
+
+        $('#recentlyArticle').html("");
+        reloadArticle();
+    }
+
+
+    function reloadArticle(){
+        //最近文章加载
+        layui.use('flow', function() {
+            var flow = layui.flow;
+            var limitNum = 10;
+            flow.load({
+                elem: '#recentlyArticle' //流加载容器
+                // , scrollElem: '#LAY_demo2' //滚动条所在元素，一般不用填，此处只是演示需要。
+                , isAuto: false
+                , isLazyimg: true
+                , done: function (page, next) { //加载下一页
+
+                    var url = "/snail/article/getArticleListByStatus";
+                    var param ={
+                        labelID : labelID,
+                        page : page,
+                        limitNum : limitNum
+                    }
+                    $.post(url, param, function(retStr){
+                        var retObj = JSON.parse(retStr);
+                        var recentlyHtml = template('recentlyTemplate', retObj);
+                        var count = retObj.count;
+                        var pageNum = count/limitNum;
+                        $('#count').text(count);
+                        // $('#recentlyArticle').html(recentlyHtml);
+                        next(recentlyHtml, page < pageNum); //总页数
+
+                        //动态设置页面高度
+                        //根据返回的文章结果集的个数来进行赋值内容区的高度
+                        var windowHeight = $(window).height();
+                        var contentHeight = $('#recentlyArticle').height();
+                        if(count <= 3){
+                            contentHeight = windowHeight*0.85;
+                            $('#recentlyArticle').css('height', contentHeight);
+                        }else{
+                            var mult = count/3;
+                            contentHeight = windowHeight*mult*0.9;
+                            $('#recentlyArticle').css('height', contentHeight);
+                        }
+                        $('#mainList').css('height', windowHeight*0.972);
+                    })
+
+                }
+            });
+        })
+    }
+
+    //跳转到文章详情页
+    function toArticleDetail(articleID){
+        //调用父页面方法
+        parent.window.toArticleDetail(articleID);
+    }
+
+    //固定的返回顶部图标
+    layui.use(['util', 'layer'], function() {
+        var layer = layui.layer;
+        util = layui.util;
+        //固定块
+        util.fixbar({
+            top: true
+            , css: {right: 50, bottom: 100}
+            , bgcolor: '#393D49!important;display:block;'
+            , showHeight: 150
+            , click: function (type) {
+                if (type === 'top') {
+                    $('#mainList').animate({'scrollTop':0},300);
+                }
+            }
+        });
+    });
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+    /*]]>*/
+</script>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <!--<link rel="stylesheet" th:href="@{/template/backgroundPicture.css}">-->
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+</head>
+<style>
+    /*首页-轮播图*/
+    .homePic{
+        width:100%;
+        height:100%;
+    }
+
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 70px;
+        height: 70px;
+        border-radius: 50px;
+        margin: auto
+    }
+
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+    .showBig:hover{
+        transform:scale(1.03);  /* 悬浮放大效果 */
+        /*color: green;*/
+        /*background-color: #F0FFF0;  */
+        color: #ff4d4d;
+        /*background-color: #F0F0F0;*/
+    }
+
+</style>
+
+<body class="layui-layout-body" style="background-color: #EEEEEE">
+<div class="layui-layout layui-layout-admin">
+    <!-- 正文区 start -->
+    <!--<div class="layui-body" style="position:absolute;left:0;">-->
+            <div class="layui-col-md12" id="top"  style="width:98%;margin:20px 42px 20px 16px;overflow-y: auto">
+                <div class="layui-row grid-demo grid-demo-bg1">
+
+                    <!-- 首页轮播图 start -->
+                    <div class="layui-col-md12"  style="height:398px;margin-top:20px;">
+                        <div class="layui-carousel" id="homePage" >
+                            <div carousel-item id="home">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 首页轮播图 end -->
+
+                    <!-- 特别推荐 start -->
+                    <div class="layui-col-md8" id="recommendArticle" style="width:73.5%;background-color: #fff;margin-top:20px;margin-right:20px;">
+                        <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">
+                            <p class="cardTitle">
+                                <i class="layui-icon" style="font-size: 30px;">&#xe705;</i>&nbsp;
+                                特别推荐
+                            </p>
+                        </div>
+                    </div>
+                    <!-- 特别推荐 end -->
+
+                    <!-- 热门标签 start -->
+                    <div class="layui-col-md3" style="margin-top:20px;height:425px;">
+                        <iframe src="/snail/label/toHomeLabel" style="width:100%;height:100%" Frameborder=No Border=0 Marginwidth=0 Marginheight=0 Scrolling=No></iframe>
+                    </div>
+                    <!-- 热门标签 end -->
+
+                    <!-- 最近文章 start -->
+                    <div class="layui-col-md9" style="width:73.5%;height:50px;background-color: #F5F5F5;margin-top:20px;">
+                        <p class="cardTitle">
+                            <i class="layui-icon" style="font-size: 30px;">&#xe705;</i>&nbsp;
+                            最近文章
+                        </p>
+
+                    </div>
+                    <div id="recentlyArticle" class="layui-col-md9" style="width:73.5%;background-color: #fff;margin-right:20px;">
+                    </div>
+
+                    <!-- 最近文章 end -->
+
+                    <!-- 最近评论 start -->
+                    <div class="layui-col-md3" style="background-color: #fff;">
+                        <div class="layui-col-md12" style="background-color: #F5F5F5;height:50px">
+                            <p class="cardTitle">
+                                <i class="layui-icon" style="font-size: 30px;">&#xe63a;</i>&nbsp;
+                                最近评论
+                            </p>
+                        </div>
+
+                        <div class="layui-col-md12" id="message" style="padding:20px;">
+
+                        </div>
+                    </div>
+                    <!-- 最近评论 end -->
+                </div>
+        </div>
+    <!--</div>-->
+    <!-- 正文区 end -->
+
+</div>
+</body>
+<script type="text/html" id="homePageTemplate">
+    {{each homePageArticleList as obj i}}
+        <div><img onclick="toArticleDetail('{{obj.articleID}}')" style="cursor:pointer;width:100%;height:100%" src="{{obj.filePath}}"></div>
+    {{/each}}
+</script>
+<script type="text/html" id="labelTemplate">
+    {{each data as obj i}}
+        <a href="#" class="layui-btn layui-btn-primary" style="margin-top:10px;">{{obj.labelName}}</a>
+    {{/each}}
+</script>
+
+<!-- 特别推荐 -->
+<script type="text/html" id="recommendTemplate">
+    {{each homePageArticleList as obj i}}
+        {{if i == 0 || i==2  || i==4}}
+        <div class="layui-col-md12" style="height:100%">
+        {{/if}}
+            <div class="layui-col-md6" style="padding:15px;border:2px solid #EEEEEE;height:100%">
+                <div  class="showBig">
+                <div  class="layui-col-md4">
+                    <img class="recommendPic" src="{{obj.filePath}}">
+                </div>
+                <div class="layui-col-md8">
+                    <p onclick="toArticleDetail('{{obj.articleID}}')" title="{{obj.title}}" style="cursor:pointer;font-size: 18px;font-weight: bold;margin-top: 8px;">
+                        {{if obj.title.length<=16}}
+                            {{obj.title}}
+                        {{else}}
+                            {{obj.title.substring(0,16)}}...
+                        {{/if}}
+                    </p>
+                    <p title="{{obj.remark.substring(0,200)}}......" style="color: #aaa;margin-top: 5px;">
+                        {{if obj.remark.length<=66}}
+                            {{obj.remark}}
+                        {{else}}
+                            {{obj.remark.substring(0,66)}}...
+                        {{/if}}
+                    </p>
+                </div>
+            </div>
+            </div>
+        {{if i==1 || i==3 || i==5}}
+        </div>
+        {{/if}}
+    {{/each}}
+</script>
+
+<script type="text/html" id="recentlyTemplate">
+    {{each homePageArticleList as obj i}}
+        <div class="layui-col-md12 showBig" style="padding:15px;border:2px solid #EEEEEE;">
+            <div  class="layui-col-md4">
+                <img class="articlePic" src="{{obj.filePath}}">
+            </div>
+            <div class="layui-col-md8">
+                <p onclick="toArticleDetail('{{obj.articleID}}')" title="{{obj.title}}" style="cursor:pointer;font-size: 25px;font-weight: bold;margin-top: 8px;">
+                    {{if obj.title.length<=25}}
+                        {{obj.title}}
+                    {{else}}
+                        {{obj.title.substring(0,25)}}...
+                    {{/if}}
+                </p>
+                <p title="{{obj.remark.substring(0,600)}}......" style="color: #aaa;font-size: 15px;margin-top: 10px;">
+                    {{if obj.remark.length<=249}}
+                        {{obj.remark}}
+                    {{else}}
+                        {{obj.remark.substring(0,249)}}...
+                    {{/if}}
+                </p>
+            </div>
+            <div style="position:absolute;bottom: 15px;right:440px">
+                <!--<i class="layui-icon layui-icon-username"></i>-->
+                <!--&nbsp;<span style="color:#aaa">李晓炜</span>-->
+                <!--<i class="layui-icon layui-icon-time" style="margin-left: 20px;color:#aaa"></i>-->
+                &nbsp;<span style="color:rgba(114,114,114,0.88);font-size: 16px">{{obj.createTime}}</span>
+                <!--<i class="layui-icon layui-icon-at" style="margin-left: 20px;color:#aaa"></i>-->
+                <span style="margin-left: 20px;color:rgba(114,114,114,0.88)">浏览量：{{obj.pageView}}</span>
+            </div>
+        </div>
+    {{/each}}
+</script>
+
+<script type="text/html" id="messageTemplate">
+    {{each messageList as obj i}}
+        {{if i<5}}
+            <div  class="layui-col-md4">
+                <img class="messagePic" src="/image/youmo.jpg">
+            </div>
+            <div class="layui-col-md8" style="margin-bottom: 10px">
+                <p style="font-size: 20px;font-weight: bold;word-wrap:break-word;">{{obj.messageUsername}}：</p>
+                <p style="color: #aaa;font-size: 15px;margin-top: 5px;">{{obj.createTime}}</p>
+                <p style="color: #666666;font-size: 18px;margin-top: 10px;word-wrap:break-word;">{{obj.content}}</p>
+            </div>
+            <hr>
+        {{/if}}
+    {{/each}}
+</script>
+
+<script type="text/javascript">
+    //初始化方法
+    $(function(){
+        //获取推荐文章列表
+        getRecommendArticleList();
+        //获取首页轮播
+        getHomePageArticeList();
+        //获取热门标签
+        getLabelList();
+        //获取最近评价
+        showMessage();
+
+        //动态设置页面高度
+        var windowHeight = $(window).height();
+        $('#top').css('height', windowHeight*0.972);
+    })
+
+    function toMessageList(){
+        $('#content').attr('src','/snail/message/toMessageList');
+    }
+
+    function getLabelList(){
+        var url = "/snail/label/getLabelList";
+        $.post(url, {status : '1'}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('labelTemplate', retStr);
+            $('#label').append(html);
+        })
+    }
+
+    function showMessage(){
+        $.post("/snail/message/getMessageList", {}, function(retStr){
+            // alert(JSON.stringify(retStr));
+            var html = template('messageTemplate', retStr);
+            $('#message').html(html);
+        })
+    }
+
+    //获取首页轮播
+    function getHomePageArticeList(){
+        var url = "/snail/article/getArticleListByStatus";
+        var param ={
+            recommendStatus : '',
+            homePageStatus : '1',
+            page : '0',
+            limitNum : '6'
+        }
+        $.post(url, param, function(retStr){
+            var retObj = JSON.parse(retStr);
+            // console.log(retObj);
+            var html = template('homePageTemplate', retObj);
+            $('#home').append(html);
+
+            //在数据准备好后--首页轮播渲染
+            layui.use('carousel', function(){
+                var carousel = layui.carousel;
+                //建造实例
+                carousel.render({
+                    elem: '#homePage'
+                    ,width: '100%' //设置容器宽度
+                    ,height: '100%' //设置容器高度
+                    ,arrow: 'always' //始终显示箭头
+                    // ,anim: 'updown' //切换动画方式
+                });
+            });
+        })
+    }
+
+    //获取推荐文章列表
+    function getRecommendArticleList(){
+        var url = "/snail/article/getArticleListByStatus";
+        var param ={
+            recommendStatus : '1',
+            homePageStatus : '',
+            page : '0',
+            limitNum : '6'
+        }
+        $.post(url, param, function(retStr){
+            var retObj = JSON.parse(retStr);
+            var recommendHtml = template('recommendTemplate', retObj);
+            // alert(recommendHtml)
+            $('#recommendArticle').append(recommendHtml);
+        })
+    }
+
+    //获取最近文章列表
+    // function getRecentlyArticleList(){
+    //     var url = "/snail/article/getArticleListByStatus";
+    //     var param ={
+    //         recommendStatus : '',
+    //         homePageStatus : '',
+    //         limitNum : '10'
+    //     }
+    //     $.post(url, param, function(retStr){
+    //         var retObj = JSON.parse(retStr);
+    //         var recentlyHtml = template('recentlyTemplate', retObj);
+    //         // alert(recentlyHtml)
+    //         $('#recentlyArticle').append(recentlyHtml);
+    //     })
+    // }
+
+    function toJson(){
+        layer.open({
+            type: 2,
+            content: '',
+            success: function(layero, index){
+                self.location='http://www.baidu.com';
+            }
+        });
+    }
+
+    //跳转到文章详情页
+    function toArticleDetail(articleID){
+        window.location.href="/snail/article/toArticleDetail?articleID="+articleID;
+    }
+
+    //固定的返回顶部图标
+    layui.use(['util', 'layer'], function() {
+        var layer = layui.layer;
+        util = layui.util;
+        //固定块
+        util.fixbar({
+            top: true
+            , css: {right: 50, bottom: 100}
+            , bgcolor: '#393D49!important;display:block;'
+            , showHeight: 150
+            , click: function (type) {
+                if (type === 'top') {
+                    $('#top').animate({'scrollTop':0},300);
+                }
+            }
+        });
+    });
+
+    //最近文章加载
+    layui.use('flow', function() {
+        var flow = layui.flow;
+        var limitNum = 6;
+        flow.load({
+            elem: '#recentlyArticle' //流加载容器
+            // , scrollElem: '#LAY_demo2' //滚动条所在元素，一般不用填，此处只是演示需要。
+            , isAuto: false
+            , isLazyimg: true
+            , done: function (page, next) { //加载下一页
+                var param ={
+                    recommendStatus : '',
+                    homePageStatus : '',
+                    page : page,
+                    limitNum : limitNum
+                }
+                // alert(JSON.stringify(param));
+                $.post('/snail/article/getArticleListByStatus', param, function(retStr) {
+                    // alert(retStr);
+                    var retObj = JSON.parse(retStr);
+                    var count = retObj.count;
+                    var pageNum = count/limitNum;
+                    var recentlyHtml = template('recentlyTemplate', retObj);
+                    // alert(recentlyHtml);
+                    next(recentlyHtml, page < pageNum); //总页数
+                })
+            }
+        });
+    })
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    });
+
+</script>
+</html>

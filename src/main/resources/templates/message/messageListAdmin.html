@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+    <script type="text/javascript" th:src="@{/template/template.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+</head>
+<style>
+
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        margin: auto
+    }
+
+    /*有滚动效果但是不显示滚动条*/
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+
+</style>
+<body class="layui-layout-body" style="background-color: #EEEEEE">
+
+<div class="layui-layout layui-layout-admin">
+<!-- 正文区 start -->
+<!--<div class="layui-body" style="position:absolute;left:0;">-->
+    <div class="layui-col-md12" id="top" style="width:95%;margin:20px 42px 20px 42px;overflow-y: auto">
+        <div class="layui-row grid-demo grid-demo-bg1">
+
+            <!-- 评论 start -->
+            <div class="layui-col-md9" id="messageContentList" style="padding:20px;width:73.5%;background-color: #fff;margin-right:20px;margin-top:20px;">
+                <div class="layui-col-md12" style="padding: 15px;">
+                    <div  class="layui-col-md12">
+                        <p style="font-size: 30px;color: #5FB878">添加评论</p>
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:18px">
+                        <textarea style="width:98%;height:80px;resize:none;border:2px solid #E0E0E0;" name="messageContent" id="messageContent" placeholder="  请输入内容..."></textarea>
+                        <span style="color:red;font-size: 20px">*</span>
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:10px">
+                        <input type="text" name="messageUsername" id="messageUsername" style="height:35px;width:45%;border:2px solid #E0E0E0;"  placeholder="  请输入昵称..." >
+                        <span style="color:red;font-size: 20px">*</span>
+                    </div>
+                    <div  class="layui-col-md12" style="margin-top:10px;">
+                        <a href="javascript:;" onclick="addMessage()" class="layui-btn" style="height:50px;width:100%;border-radius: 5px">
+                            <p style="font-size: 20px;margin-top:7px;">提交评价</p>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="layui-col-md12" style="background-color: #F5F5F5;height:46px;margin-top: 30px">
+                    <p class="cardTitle" style="font-size: 18px;color: black;font-weight: bold">共<span id="messageCount">0</span>条评论</p>
+                </div>
+                <div class="layui-col-md12" style="padding:20px;border:2px solid #E0E0E0;" id="message">
+
+                </div>
+            </div>
+            <!-- 评论 end -->
+
+            <!-- 热门标签 start -->
+            <div class="layui-col-md3" style="background-color: #fff;margin-top:20px;height:425px;">
+                <iframe src="/snail/label/toHomeLabel" style="width:100%;height:100%" Frameborder=No Border=0 Marginwidth=0 Marginheight=0 Scrolling=No></iframe>
+            </div>
+            <!-- 热门标签 end -->
+
+        </div>
+    </div>
+<!--</div>-->
+<!-- 正文区 end -->
+</div>
+</body>
+<script type="text/html" id="messageTemplate">
+    {{each messageList as obj i}}
+        <div  class="layui-col-md1">
+            <img class="messagePic" src="/image/user.png">
+        </div>
+        <div class="layui-col-md11" style="margin-bottom: 10px">
+            <div class="layui-col-md12" style="margin-bottom: 10px">
+                <p style="font-size: 16px;font-weight: bold;">{{obj.messageUsername}}：</p>
+                <p style="color: #666666;font-size: 15px;margin-top: 10px;word-wrap:break-word;">{{obj.content}}</p>
+            </div>
+            <div class="layui-col-md12" style="margin-bottom: 10px">
+                <span style="color: #aaa;font-size: 15px;">{{obj.createTime}}</span>
+                <span onclick="deleteMessage('{{obj.messageID}}')" style="color: red;font-size: 15px;margin-right: 35px;float:right;">删除</span>
+                <span onclick="" style="font-size: 15px;margin-right: 35px;float:right;color:cadetblue">回复</span>
+            </div>
+        </div>
+        <hr>
+    {{/each}}
+</script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+    $(function(){
+        //回显文章留言信息
+        showMessageList();
+    })
+
+    //添加留言
+    function addMessage(){
+        var messageUsername = $('#messageUsername').val();
+        var messageContent = $('#messageContent').val();
+
+        if(messageContent == ''){
+            showMsg("请输入留言内容");
+            return;
+        }
+        if(messageUsername == ''){
+            showMsg("请输入昵称");
+            return;
+        }
+        if(messageUsername.length > 30){
+            showMsg("昵称字数不得超过30个");
+            return;
+        }
+
+        var url = "/snail/message/addMessage";
+        var param ={
+            messageUsername : messageUsername,
+            messageContent : messageContent
+        }
+        $.post(url, param, function(retStr){
+            if(retStr == '1'){
+                showMessageList();
+                showMsg("操作成功");
+            }else{
+                showMsg("操作失败");
+            }
+        })
+    }
+
+    //删除留言
+    function deleteMessage(messageID){
+        layer.confirm('确定要删除吗?', {icon: 7, title:'提示'}, function(index){
+            $.post("/snail/message/deleteMessage", {messageID:messageID}, function(retStr){
+                if(retStr == '1'){
+                    showMsg("操作成功");
+                }else{
+                    showMsg("操作失败");
+                }
+                showMessageList();
+            })
+        })
+
+    }
+
+    //刷新留言信息
+    function showMessageList(){
+        $.post("/snail/message/getMessageList", {}, function(retStr){
+            var html = template('messageTemplate', retStr);
+            //动态设置页面高度
+            var windowHeight = $(window).height();
+            $('#top').css('height', windowHeight*0.972);
+
+            var messageLength = retStr.messageList.length;
+            var contentHeight = 1;
+            if(messageLength<=2){
+                contentHeight = windowHeight * 0.85;
+            }else{
+                var mult = (messageLength-2)/6+1;
+                // alert( mult * 0.9);
+                contentHeight = windowHeight * mult * 0.9;
+            }
+            $('#messageContentList').css('height', contentHeight);
+
+            if(messageLength==0){
+                $('#message').html("没有评价");
+                $('#messageCount').html(0);
+            }else{
+                $('#message').html(html);
+                $('#messageCount').html(retStr.messageCount);
+            }
+            $('#messageContent').val('');
+            $('#messageUsername').val('');
+        })
+    }
+
+//提示框
+function showMsg(msg){
+    layer.msg(msg, {
+        time: 3000 //3s后自动关闭
+    });
+}
+
+//JavaScript代码区域
+layui.use('element', function(){
+    var element = layui.element;
+});
+
+layui.use('layer', function() { //独立版的layer无需执行这一句
+    var $ = layui.jquery, layer = layui.layer; //独立版的layer无需执行这一句
+})
+
+/*]]>*/
+</script>
+</html>

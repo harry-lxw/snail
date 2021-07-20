@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/layer/mobile/layer.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/jquery.min.js}"></script>
+</head>
+<style>
+    /*首页-轮播图*/
+    .homePic{
+        width:100%;
+        height:100%;
+    }
+
+    /*特别推荐-图片*/
+    .recommendPic{
+        width: 140px;
+        height: 100px;
+        border-radius: 10px;
+    }
+
+    /*最近发布文章-图片*/
+    .articlePic{
+        width: 280px;
+        height: 180px;
+        border-radius: 10px;
+        margin: auto
+    }
+
+    /*卡片标题*/
+    .cardTitle{
+        font-size: 22px;
+        color: #696969;
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    /*评论-图片*/
+    .messagePic{
+        width: 70px;
+        height: 70px;
+        border-radius: 50px;
+        margin: auto
+    }
+
+    /*有滚动效果但是不显示滚动条*/
+    div::-webkit-scrollbar {
+        width: 0;
+    }
+</style>
+
+<body class="layui-layout-body" style="">
+<div class="layui-layout layui-layout-admin layui-bg-blue">
+    <!-- 头部菜单区 start -->
+        <div class="layui-header">
+            <div class="layui-logo">
+                <p style="font-size: 28px">蜗牛</p>
+            </div>
+            <!-- 头部区域（可配合layui已有的水平导航） -->
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item">
+                    <a href="javascript:void(0)" onclick="toArticleList()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe705;</i>&nbsp;
+                        文章管理
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:void(0)" onclick="toLabelList()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe66e;</i>&nbsp;
+                        标签管理
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:void(0)" onclick="toMessageList()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe63a;</i>&nbsp;
+                        留言板管理
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:void(0)" onclick="toLogList()">
+                        <i class="layui-icon" style="font-size: 20px;">&#xe68d;</i>&nbsp;
+                        日志管理
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    <!-- 头部菜单区 end -->
+
+    <!-- 正文区 start -->
+    <div class="layui-body" style="position:absolute;left:0;bottom: 24px;top: 32px">
+        <iframe id="main" src="" style="width:100%;height:98%" Frameborder=No Border=0 Marginwidth=0 Marginheight=0 Scrolling=No></iframe>
+    </div>
+    <!-- 正文区 end -->
+
+    <!-- 底部固定区域 start -->
+    <div class="layui-footer"  style="position:absolute;left:0;background-color: #2F4056;">
+        <span style="color:#bbb">© 2021 李晓炜 &nbsp;&nbsp;&nbsp;  email_lxw@163.com  &nbsp;&nbsp;&nbsp;   免责声明</span>
+    </div>
+    <!-- 底部固定区域 end -->
+
+</div>
+</body>
+<script type="text/html" id="barDemo">
+    <a onclick="updateArticle('{{d.articleID}}')" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a onclick="deleteArticle('{{d.articleID}}');" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+<!-- 是否删除 -->
+<script type="text/html" id="status">
+    <p>
+        {{# if(d.status == '1'){ }}
+            否
+        {{# } }}
+        {{# if(d.status == '99'){ }}
+            是
+        {{# } }}
+    </p>
+</script>
+
+<!-- 特别推荐 -->
+<script type="text/html" id="recommendStatus">
+    <p>
+        {{# if(d.recommendStatus == '1'){ }}
+            是
+        {{# } }}
+        {{# if(d.recommendStatus == '0'){ }}
+            否
+        {{# } }}
+    </p>
+</script>
+
+<!-- 轮播 -->
+<script type="text/html" id="homePageStatus">
+    <p>
+        {{# if(d.homePageStatus == '1'){ }}
+            是
+        {{# } }}
+        {{# if(d.homePageStatus == '0'){ }}
+            否
+        {{# } }}
+    </p>
+</script>
+
+<script type="text/javascript" th:inline="none">
+    var table ='';
+    var iframeUrl = '/snail/article/toAdminHome';
+    $(function () {
+        //刷新列表
+        searchData();
+        //加载管理版首页
+        reloadIframe();
+    })
+
+    //重置
+    function reset(){
+        $('#title').val('');
+        $('#content').val('');
+        $('#label').val('');
+    }
+
+    //查询列表数据
+    function searchData(){
+        // var title = $('#title').val();
+        // var content = $('#content').val();
+        // var url = 'http://localhost:8088/snail/article/getArticleList?title='+title+'&content='+content;
+
+        layui.use('table', function(){
+            table = layui.table;
+            // 第一个实例
+            table.render({
+                elem: '#demo'
+                ,height: 640
+                ,url: '/snail/article/getArticleList' //数据接口
+                ,page: true //开启分页
+                ,limit: 10
+                ,cols: [[ //表头
+                    {type: 'checkbox',fixed: 'left'}
+                    // ,{field: 'articleID', title: 'articleID', width:120, sort: true, fixed: 'left'}
+                    ,{field: 'title',align:'center', title: '标题', width:320}
+                    ,{field: 'pageView',align:'center', title: '浏览量', width:120, sort: true}
+                    ,{field: 'supportCount',align:'center', title: '点赞量', width:120}
+                    ,{field: 'createTime',align:'center', title: '创建时间', width: 180, sort: true}
+                    ,{field: 'homePageStatus',align:'center', title: '轮播', width: 120, templet:'#homePageStatus'}
+                    ,{field: 'recommendStatus',align:'center', title: '特别推荐', width: 120, templet:'#recommendStatus'}
+                    ,{field: 'status',align:'center',title: '是否删除', width: 120, templet: '#status'}
+                    ,{fixed: 'right',align:'center', title: '操作', toolbar: '#barDemo'}
+                ]]
+            });
+
+        })
+    }
+
+    function reload(){
+        table.reload('demo', {
+            where : {
+                title : $('#title').val(),
+                content : $('#content').val()
+            }
+        });
+    }
+
+    //重新加载iframe
+    function reloadIframe(){
+        $('#main').attr('src', iframeUrl);
+    }
+
+    //跳转到文章列表
+    function toArticleList(){
+        iframeUrl = '/snail/article/toAdminHome';
+        reloadIframe();
+    }
+
+    //跳转到标签列表
+    function toLabelList() {
+        iframeUrl = '/snail/label/toLabelListAdmin';
+        reloadIframe();
+    }
+
+    //跳转到留言板列表
+    function toMessageList(){
+        iframeUrl = '/snail/message/toMessageListAdmin';
+        reloadIframe();
+    }
+
+    //跳转到日志列表
+    function toLogList(){
+        iframeUrl = '/snail/log/toLogList';
+        reloadIframe();
+    }
+
+    //新增文章
+    function addArticle(){
+        layer.open({
+            type: 2,
+            title: '新增文章',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['850px' , '700px'],
+            content: 'article/toAddArticle',
+            btn: ['保存', '取消'],
+            yes: function(index, layero){
+                //获取弹出子页面内部DOM
+                var body = layer.getChildFrame('body', index);
+                var addTitle = body.find('#title').val();
+                var addHomePageStatus = body.find('#homePageStatus').val();
+                var addRecommendStatus = body.find('#recommendStatus').val();
+                var addContent = body.find('#content').val();
+
+                if(addTitle == '' || addTitle == null){
+                    showMsg("请输入标题");
+                    return;
+                }
+                if(addHomePageStatus == '' || addHomePageStatus == null){
+                    showMsg("请选择是否轮播展示");
+                    return;
+                }
+                if(addRecommendStatus == '' || addRecommendStatus == null){
+                    showMsg("请选择是否推荐展示");
+                    return;
+                }
+                if(addContent == '' || addContent == null){
+                    showMsg("请输入正文");
+                    return;
+                }
+
+                var param = {
+                    title : addTitle,                                  //标题
+                    homePageStatus : addHomePageStatus,               //轮播
+                    recommendStatus : addRecommendStatus,             //推荐
+                    content : addContent                               //正文
+                }
+                $.post('/snail/article/addArticle', param, function(retStr){
+                    if(retStr == 0 || retStr == '0'){
+                        layer.msg('添加失败', {
+                            icon: 2,
+                            time: 1000,
+                        },function(){
+                            layer.close(index);
+                            //刷新列表
+                            searchData();
+                        });
+                    }else{
+                        layer.msg('添加成功', {
+                            icon: 1,
+                            time: 1000,
+                        },function(){
+                            layer.close(index);
+                            //刷新列表
+                            searchData();
+                        });
+                    }
+                })
+            }
+        });
+    }
+
+    //编辑文章
+    function updateArticle(articleID){
+        layer.open({
+            type: 2,
+            title: '编辑文章',
+            maxmin: true,
+            shadeClose: true, //点击遮罩关闭层
+            area : ['850px' , '700px'],
+            content: 'article/toUpdateArticle?articleID='+articleID,
+            btn: ['保存', '取消'],
+            yes: function(index, layero){
+                //获取弹出子页面内部DOM
+                var body = layer.getChildFrame('body', index);
+                var updateTitle = body.find('#title').val();
+                var updateHomePageStatus = body.find('#homePageStatus').val();
+                var updateRecommendStatus = body.find('#recommendStatus').val();
+                var updateContent = body.find('#content').val();
+
+                if(updateTitle == '' || updateTitle == null){
+                    showMsg("请输入标题");
+                    return;
+                }
+                if(updateHomePageStatus == '' || updateHomePageStatus == null){
+                    showMsg("请选择是否轮播展示");
+                    return;
+                }
+                if(updateRecommendStatus == '' || updateRecommendStatus == null){
+                    showMsg("请选择是否推荐展示");
+                    return;
+                }
+                if(updateContent == '' || updateContent == null){
+                    showMsg("请输入正文");
+                    return;
+                }
+
+                var param = {
+                    articleID : articleID,
+                    title : updateTitle,                                  //标题
+                    homePageStatus : updateHomePageStatus,               //轮播
+                    recommendStatus : updateRecommendStatus,             //推荐
+                    content : updateContent                               //正文
+                }
+                $.post('/snail/article/updateArticle', param, function(retStr){
+                    if(retStr == 0 || retStr == '0'){
+                        layer.msg("修改失败");
+                        layer.close(index);
+                        //刷新列表
+                        searchData();
+                    }else{
+                        layer.msg("修改成功");
+                        layer.close(index);
+                        //刷新列表
+                        searchData();
+                    }
+                })
+            }
+        });
+    }
+
+    //删除文章
+    function deleteArticle(articleID){
+        layer.confirm('确定要删除吗?', {icon: 7, title:'提示'}, function(index){
+            var url = "/snail/article/deleteArticle";
+            $.post(url, {articleID:articleID}, function(retStr){
+                if(retStr == '1'){
+                    layer.msg('删除成功', {
+                        icon: 1,
+                    },function(){
+                        //刷新列表
+                        searchData();
+                    });
+                }else{
+                    layer.msg('删除失败', {
+                        icon: 1,
+                    },function(){
+                        //刷新列表
+                        searchData();
+                    });
+                }
+            })
+
+            layer.close(index);
+        });
+    }
+
+    //提示框
+    function showMsg(msg){
+        layer.msg(msg, {
+            time: 2000 //2s后自动关闭
+        });
+    }
+
+    //解决iframe刷新回到首页问题
+    $("body").bind("keydown",function(event){
+        if (event.keyCode == 116) {
+            event.preventDefault(); //阻止默认刷新
+            $("#main").attr("src",window.frames["main"].src);
+        }
+    })
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+    })
+
+    layui.use('form', function() {
+        var form = layui.form;
+    })
+
+</script>
+</html>
